@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttershare/widgets/header.dart';
 import 'package:fluttershare/widgets/progress.dart';
 
-final usersRef = Firestore.instance.collection('users');
+//final usersRef = Firestore.instance.collection('users');
 class Timeline extends StatefulWidget {
   @override
   _TimelineState createState() => _TimelineState();

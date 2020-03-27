@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttershare/models/user.dart';
 import 'package:fluttershare/pages/activity_feed.dart';
 import 'package:fluttershare/pages/create_account.dart';
 import 'package:fluttershare/pages/profile.dart';
@@ -11,10 +13,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-
 final GoogleSignIn googleSignIn = GoogleSignIn();
+final StorageReference storageRef = FirebaseStorage.instance.ref();
 final usersRef = Firestore.instance.collection("users");
+final postRef = Firestore.instance.collection("post");
+
 final timestamp = DateTime.now();
+User currentUser;
 
 class Home extends StatefulWidget {
   @override
@@ -39,6 +44,7 @@ class _HomeState extends State<Home> {
           print(err);
     });
         //reauthenticate user when app open again
+
     googleSignIn.signInSilently(suppressErrors: false)
     .then((account) {
        handleSignIn (account);
@@ -60,11 +66,10 @@ class _HomeState extends State<Home> {
     }
   }
 
-
   createUserInFirestore() async{
     //1.check if user exists to id in DB
     final GoogleSignInAccount user =  googleSignIn.currentUser;
-    final DocumentSnapshot doc = await usersRef.document(user.id).get();
+     DocumentSnapshot doc = await usersRef.document(user.id).get();
 
     if (!doc.exists){
       //2.if doesnt exist we want to create it to create accoutnt page
@@ -79,8 +84,11 @@ class _HomeState extends State<Home> {
        "bio" : "",
        "timestamp" : timestamp //now
      });
-
+     doc = await usersRef.document(user.id).get(); //refectch it!!!
     }
+    //to deserialize it
+    currentUser =  User.fromDocument(doc); // to be able to pass it in diff pages
+     print(currentUser);
   }
 
 
@@ -115,15 +123,14 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: PageView(
         children: <Widget>[
-//          Timeline(),
         RaisedButton(
            child: Text('Logout'),
            onPressed: logout,
         ),
           ActivityFeed(),
-          Upload(),
+          Upload(currentUser: currentUser),
           Search(),
-          Profile(),
+          Profile(profileId: currentUser?.id),
         ],
         controller: pageController,
         onPageChanged: onPagedChanged,
@@ -173,7 +180,7 @@ class _HomeState extends State<Home> {
             GestureDetector(
               onTap: login(),
               child: Container(
-                width: 260.0,
+                width: 200.0,
                   height: 70.0,
                 decoration: BoxDecoration(
                   image: DecorationImage(

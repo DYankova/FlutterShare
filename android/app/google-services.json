@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "91801299362-8ucm1khhp2q7q3a9puei696lk8tgqpho.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dilyana.fluttershare",
+            "certificate_hash": "e5bc54a1873634f58f735f2b3518b148c98c10b8"
+          }
+        },
+        {
           "client_id": "91801299362-q1opo8o3l1mh2r41m2o72e3t8o3ih4gq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
