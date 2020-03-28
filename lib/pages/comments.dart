@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttershare/widgets/header.dart';
 
-
 class Comments extends StatefulWidget {
   final String postId;
   final String postOwnerId;
@@ -15,7 +14,6 @@ class Comments extends StatefulWidget {
     postOwnerId: this.postOwnerId,
     postMediaUrl: this.postMediaUrl,
   );
-
 }
 
 class CommentsState extends State<Comments> {
@@ -28,9 +26,8 @@ class CommentsState extends State<Comments> {
   CommentsState({this.postId, this.postMediaUrl, this.postOwnerId});
 
   buildComments(){
-    return Text("Co");
+    return Text("Comments");
   }
-
 
   @override
   Widget build(BuildContext context) {

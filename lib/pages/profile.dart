@@ -26,9 +26,7 @@ class _ProfileState extends State<Profile> {
   bool isLoading = false;
   int postCount = 0;
   List<Post> posts = [];
-  
-  
-  
+
   @override
   void initState(){
     super.initState();
@@ -40,16 +38,16 @@ class _ProfileState extends State<Profile> {
       isLoading = true;
     });
     QuerySnapshot snapshot = await postRef.document(widget.profileId)
-    .collection('userPosts')
-    .orderBy('timestamp',descending: true)
-    .getDocuments();
+        .collection('userPosts')
+        .orderBy('timestamp',descending: true)
+        .getDocuments();
+
     setState(() {
       isLoading = false;
       postCount = snapshot.documents.length;
       posts = snapshot.documents.map((doc) => Post.fromDocument(doc)).toList();
     });
   }
-
 
   Column buildCountColumn(String label, int count){
     return Column(
@@ -108,7 +106,6 @@ class _ProfileState extends State<Profile> {
       ),
     );
   }
-
 
   buildProfileButton(){
     //if we are viewing our profile - wdit button instead
@@ -203,7 +200,6 @@ class _ProfileState extends State<Profile> {
 
   buildProfilePost(){
     //display after fetch
-
     if(isLoading){
       circularProgress();
     } else if(posts.isEmpty){
@@ -228,8 +224,8 @@ class _ProfileState extends State<Profile> {
 
 
     List<GridTile> gridTiles = [];
-    posts.forEach((post) {
-      gridTiles.add(GridTile(child: PostTile(post)));
+      posts.forEach((post) {
+        gridTiles.add(GridTile(child: PostTile(post)));
     });
 //    return GridView.count(
 //      crossAxisCount: 3,
@@ -244,8 +240,6 @@ class _ProfileState extends State<Profile> {
       children: posts,
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {

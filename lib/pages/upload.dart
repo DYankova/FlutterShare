@@ -14,7 +14,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as Im;
 import 'package:uuid/uuid.dart';
 
-
 class Upload extends StatefulWidget {
   final User currentUser;
 
@@ -29,7 +28,7 @@ class _UploadState extends State<Upload> {
   TextEditingController locationController = TextEditingController();
    File file;
    bool isUploading  = false;
-   String postId = Uuid().v4(); //autocreate uniq id
+   String postId = Uuid().v4(); //auto-create unique id
 
   handleTakePhoto() async{
     Navigator.pop(context);
@@ -40,7 +39,7 @@ class _UploadState extends State<Upload> {
     });
   }
 
-  handleChooseFromGalery()async{
+  handleChooseFromGallery()async {
     Navigator.pop(context);
     File file = await ImagePicker.pickImage(source: ImageSource.gallery);
     setState(() {
@@ -61,8 +60,8 @@ class _UploadState extends State<Upload> {
                 onPressed: handleTakePhoto
             ),
             SimpleDialogOption(
-              child: Text("From galery"),
-                onPressed:  handleChooseFromGalery
+              child: Text("From gallery"),
+                onPressed:  handleChooseFromGallery
             ),
             SimpleDialogOption(
               child: Text("Cancel"),
@@ -74,7 +73,6 @@ class _UploadState extends State<Upload> {
     );
   }
 
-
   Container buildSplashScreen(){
       return Container(
         color: Theme.of(context).accentColor.withOpacity(0.6),
@@ -83,7 +81,7 @@ class _UploadState extends State<Upload> {
           children: <Widget>[
             SvgPicture.asset('assets/images/upload.svg',height: 250.0),
             Padding(padding: EdgeInsets.only(top: 20),
-            child: RaisedButton(
+             child: RaisedButton(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
               child: Text("Upload Image",
               style: TextStyle(
@@ -94,11 +92,9 @@ class _UploadState extends State<Upload> {
               onPressed: () => selectImage(context),
             ),)
           ],
-      ),
+        ),
       );
   }
-
-
   clearImage(){
     setState(() {
       file = null;
@@ -114,7 +110,7 @@ class _UploadState extends State<Upload> {
 
   createPostInFirestore({ String mediaURl, String location, String description}){
     //loc, caption
-    postRef
+     postRef
         .document(widget.currentUser.id)
         .collection("userPosts")
         .document(postId)
@@ -129,7 +125,6 @@ class _UploadState extends State<Upload> {
           "likes" : {},
          });
   }
-
 
   handleSubmit() async{
     setState(() {
@@ -151,13 +146,13 @@ class _UploadState extends State<Upload> {
   }
 
   //compress images fo add them to Firebase
-  compressImage() async{
+  compressImage() async {
     final tempDir = await getTemporaryDirectory();
     final path = tempDir.path;
     //from image.io
      Im.Image imageFile = Im.decodeImage(file.readAsBytesSync());
      //compressed image file
-    final compressedImageFile = File('$path/img_$postId.jpg')..writeAsBytesSync(Im.encodeJpg(imageFile, quality: 80));
+     final compressedImageFile = File('$path/img_$postId.jpg')..writeAsBytesSync(Im.encodeJpg(imageFile, quality: 80));
 
     setState(() {
       file = compressedImageFile;
@@ -230,7 +225,7 @@ class _UploadState extends State<Upload> {
          ),
          Divider(),
          ListTile(
-           leading: Icon(Icons.pin_drop, color: Colors.deepOrangeAccent,size: 35.0,),
+           leading: Icon(Icons.pin_drop, color: Colors.pink,size: 35.0,),
            title: Container(
              width: 250.0,
              child: TextField(
@@ -246,7 +241,7 @@ class _UploadState extends State<Upload> {
            width: 200.0,
            height: 100.0,
            alignment: Alignment.center,
-           color: Colors.blue,
+           color: Colors.lightBlueAccent,
            child: RaisedButton.icon(
              label: Text("Use current location",
                  style: TextStyle(color: Colors.white),
@@ -254,29 +249,26 @@ class _UploadState extends State<Upload> {
            shape: RoundedRectangleBorder(
              borderRadius: BorderRadius.circular(30.0)
            ),
-             color: Colors.blue,
-             onPressed: getUserLOcation,
+             color: Colors.blueAccent,
+             onPressed: getUserLocation,
            icon: Icon(
              Icons.my_location,
              color: Colors.white,
            ),
            ),
-
-
          )
        ],
      ),
    );
   }
 
-  getUserLOcation() async {
+  getUserLocation() async {
     Position position = await Geolocator().getCurrentPosition(desiredAccuracy:  LocationAccuracy.high); //how good is location
     List<Placemark> placemarks = await Geolocator().placemarkFromCoordinates(position.latitude, position.longitude);
     Placemark placemark = placemarks[0];
     String formattedAddress =  "${placemark.locality}";
     locationController.text = formattedAddress;
   }
-
 
   @override
   Widget build(BuildContext context) {

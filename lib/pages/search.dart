@@ -11,18 +11,18 @@ class Search extends StatefulWidget {
   _SearchState createState() => _SearchState();
 }
 
-
 class _SearchState extends State<Search> {
 
-  TextEditingController searchEditingController = TextEditingController();//to delete on X
+  TextEditingController searchEditingController = TextEditingController(); //to delete on X
   Future<QuerySnapshot> searchResultsFuture ;
+
   Future<QuerySnapshot> handleSearch(String query){
     Future<QuerySnapshot> users = usersRef. where(
         "displayName", isGreaterThanOrEqualTo: query)
         .getDocuments();
-    setState(() { //if it is in a state we van use it later
-      searchResultsFuture = users;
-    }
+     setState(() { //if it is in a state we van use it later
+       searchResultsFuture = users;
+     }
     );
   }
   clearSearch(){
@@ -72,8 +72,7 @@ class _SearchState extends State<Search> {
     );
   }
 
-
-  builSearchResult(){
+  buildSearchResult(){
     return FutureBuilder(
       future: searchResultsFuture,
       builder: (context, snapshot){
@@ -98,7 +97,7 @@ class _SearchState extends State<Search> {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor.withOpacity(0.8),
       appBar: buildSearchField(),
-      body: searchResultsFuture == null ?   buildNoContent() : builSearchResult(),
+      body: searchResultsFuture == null ?   buildNoContent() : buildSearchResult(),
     );
   }
 }

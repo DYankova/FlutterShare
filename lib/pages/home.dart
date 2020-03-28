@@ -30,18 +30,18 @@ class _HomeState extends State<Home> {
   bool isAuth = false;
   PageController pageController;
   int pageIndex = 0;
-  
+
  //listen if user is sign in
   @override
   void initState() {
     super.initState();
-    pageController = PageController(); //despose it when we dont need it
+    pageController = PageController(); //dispose it when we don't need it
         googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
           handleSignIn (account);
         }, onError: (err) {
           print(err);
     });
-        //reauthenticate user when app open again
+        //re-authenticate user when app open again
 
     googleSignIn.signInSilently(suppressErrors: false)
     .then((account) {
@@ -64,13 +64,13 @@ class _HomeState extends State<Home> {
     }
   }
 
-  createUserInFirestore() async{
+  createUserInFirestore() async {
     //1.check if user exists to id in DB
     final GoogleSignInAccount user =  googleSignIn.currentUser;
-     DocumentSnapshot doc = await usersRef.document(user.id).get();
+    DocumentSnapshot doc = await usersRef.document(user.id).get();
 
     if (!doc.exists){
-      //2.if doesnt exist we want to create it to create accoutnt page
+      //2.if doesnt exist we want to create it to create account page
      final username  = await Navigator.push(context, MaterialPageRoute(builder: (context) => CreateAccount())); //to come back here
 
     //3. get username to create account , make new user document in user collection
@@ -86,9 +86,7 @@ class _HomeState extends State<Home> {
     }
     //to deserialize it
     currentUser =  User.fromDocument(doc); // to be able to pass it in diff pages
-     print(currentUser);
   }
-
 
   @override
   void dispose() {
@@ -147,7 +145,6 @@ class _HomeState extends State<Home> {
         ],
       ),
     );
-//
   }
 
   buildsUnAuthScreen(){
