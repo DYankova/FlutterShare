@@ -30,9 +30,7 @@ class _HomeState extends State<Home> {
   bool isAuth = false;
   PageController pageController;
   int pageIndex = 0;
-
-
-
+  
  //listen if user is sign in
   @override
   void initState() {

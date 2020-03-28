@@ -1,9 +1,14 @@
+//import 'dart:html';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttershare/models/user.dart';
+import 'package:fluttershare/pages/comments.dart';
 import 'package:fluttershare/pages/home.dart';
 import 'package:fluttershare/widgets/progress.dart';
+
+import 'custom_image.dart';
 
 class Post extends StatefulWidget {// a post model in the widget
   final String postId;
@@ -41,6 +46,7 @@ class Post extends StatefulWidget {// a post model in the widget
         count += 1;
       }
     });
+    return count;
   }
 
 //not used!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -54,12 +60,12 @@ class Post extends StatefulWidget {// a post model in the widget
     mediaUrl: this.mediaUrl,
     likes: this.likes,
     likesCount: getLikeCount(this.likes)
-
   );
 
 }
 
 class _PostState extends State<Post> {
+  final String currentUseId = currentUser?.id;
   final String postId;
   final String ownerId;
   final String username;
@@ -68,6 +74,7 @@ class _PostState extends State<Post> {
   final String mediaUrl;
   int likesCount = 0 ;//not final because they will be updated
   Map likes;
+  bool isLiked;
 
   _PostState({this.postId, this.ownerId, this.username, this.location,
     this.description, this.mediaUrl, this.likes, this.likesCount});
@@ -87,7 +94,12 @@ class _PostState extends State<Post> {
             backgroundColor: Colors.grey,
             ),
            title: GestureDetector(
-//             onTap: ,
+             onTap: showComments(
+               context, //to be able to push to comments page
+               postId: postId,
+               ownerId: ownerId,
+               mediaUrl: mediaUrl,
+             ),
             child: Text(
             user.username,
             style: TextStyle(
@@ -106,13 +118,44 @@ class _PostState extends State<Post> {
   );
   }
 
+  handleLikePost(){
+
+    //check if already liked, unlike
+    bool _isLike = likes[currentUseId] == true; //unlike it
+      if (_isLike) {
+        postRef
+            .document(ownerId)
+            .collection('userPosts')
+            .document(postId)
+            .updateData({'likes.$currentUseId': false});
+        setState(() {
+          likesCount -= 1;
+          isLiked = false;
+          likes[currentUseId] = false;
+        });
+      } else if(!_isLike) { //like it
+          postRef
+          .document(ownerId)
+          .collection('userPosts')
+          .document(postId)
+          .updateData({'likes.$currentUseId': true});
+      setState(() {
+        likesCount += 1;
+        isLiked = false;
+        likes[currentUseId] = true;
+      });
+      }
+  }
+
+
+
   buildPostImage(){//tap twice on the image
     return GestureDetector(
-//      onDoubleTap: () => print("like the post);
+      onDoubleTap: handleLikePost,
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
-          Image.network(mediaUrl),
+          cachedNetworkImage(mediaUrl),
         ],
     )
     );
@@ -127,9 +170,9 @@ class _PostState extends State<Post> {
             Padding(
               padding: EdgeInsets.only(top: 40.0, left: 20.0)),
               GestureDetector(
-//                onTap: ,
+                onTap: handleLikePost,
                 child: Icon(
-                  Icons.favorite_border,
+                 isLiked ? Icons.favorite : Icons.favorite_border,
                   size: 28.0,
                   color: Colors.pink,
                 ),
@@ -183,6 +226,7 @@ class _PostState extends State<Post> {
 
   @override
   Widget build(BuildContext context) {
+    isLiked = (likes[currentUseId]== true);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -192,4 +236,17 @@ class _PostState extends State<Post> {
       ],
     );
   }
+
+  showComments(BuildContext context, {String postId, String ownerId, String mediaUrl}){
+    Navigator.push(context, MaterialPageRoute(builder: (context){
+      return Comments(//comments page
+         postId:postId,
+         postOwnerId: ownerId,
+         postMediaUrl:mediaUrl,
+      );
+    }));
+  }
+
+
+
 }
