@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:fluttershare/models/user.dart';
 import 'package:fluttershare/pages/edit_profile.dart';
 import 'package:fluttershare/pages/home.dart';
 import 'package:fluttershare/widgets/header.dart';
+import 'package:fluttershare/widgets/post.dart';
 import 'package:fluttershare/widgets/progress.dart';
 
 class Profile extends StatefulWidget {
@@ -19,6 +21,33 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   final String currentUserId = currentUser?.id;
+  bool isLoading = false;
+  int postCount = 0;
+  List<Post> posts = [];
+  
+  
+  
+  @override
+  void initState(){
+    super.initState();
+    getProfilePosts();
+  }
+
+  getProfilePosts() async{
+    setState(() {
+      isLoading = true;
+    });
+    QuerySnapshot snapshot = await postRef.document(widget.profileId)
+    .collection('userPosts')
+    .orderBy('timestamp',descending: true)
+    .getDocuments();
+    setState(() {
+      isLoading = false;
+      postCount = snapshot.documents.length;
+      posts = snapshot.documents.map((doc) => Post.fromDocument(doc)).toList();
+    });
+  }
+
 
   Column buildCountColumn(String label, int count){
     return Column(
@@ -52,21 +81,19 @@ class _ProfileState extends State<Profile> {
     EditProfile(currentUserId: currentUserId)));
   }
 
-
-
   Container buildButton({ String text, Function function}){
     return Container(
       padding: EdgeInsets.only(top: 2.5),
       child: FlatButton(
         onPressed: function,
         child: Container(
-          width: 250.0,
+          width: 210.0,
           height: 28.0,
           child: Text(
             text, style: TextStyle(
             color: Colors.white,
                 fontWeight: FontWeight.bold
-          ),
+           ),
           ),
           alignment: Alignment.center,
           decoration: BoxDecoration(
@@ -80,6 +107,7 @@ class _ProfileState extends State<Profile> {
     );
   }
 
+
   buildProfileButton(){
     //if we are viewing our profile - wdit button instead
     bool isProfileOwner = currentUserId == widget.profileId;
@@ -90,8 +118,6 @@ class _ProfileState extends State<Profile> {
       );
     }
   }
-
-
 
   buildProfileHeader(){//resolve the future
     return FutureBuilder(
@@ -121,7 +147,7 @@ class _ProfileState extends State<Profile> {
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
-                            buildCountColumn("posts", 0),
+                            buildCountColumn("posts", postCount),
                             buildCountColumn("followers", 0),
                             buildCountColumn("following", 0)//the tree sections
                           ],//space them
@@ -173,6 +199,17 @@ class _ProfileState extends State<Profile> {
     );
   }
 
+  buildProfilePost(){
+    //display after fetch
+
+    if(isLoading){
+      circularProgress();
+    }
+    return Column(
+      children: posts,
+    );
+  }
+
 
 
   @override
@@ -181,7 +218,9 @@ class _ProfileState extends State<Profile> {
       appBar: header(context, titleText: "Profile"),
       body: ListView(
         children: <Widget>[
-          buildProfileHeader()
+          buildProfileHeader(),
+          Divider(height: 0.0,),
+          buildProfilePost(),
         ],
       ),
     );

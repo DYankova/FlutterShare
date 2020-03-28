@@ -125,6 +125,7 @@ class _UploadState extends State<Upload> {
           "mediaUrl": mediaURl,
           "location" : location,
           "timestamp": timestamp,
+          "description": description,
           "likes" : {},
          });
   }
